@@ -21,6 +21,13 @@ struct Event
     }
 };
 
+struct adminacc
+{
+public:
+    string adm = "Yash_kursange";
+    string pass = "@Yash123";
+};
+
 struct Node
 {
     Event event;
@@ -287,7 +294,35 @@ int main()
     cout << "Welcome to smart event manager pls login to proceed" << endl;
     cout << "1. login as Admin" << endl;
     cout << "2. Login as user" << endl;
-    cin >> log;
+    bool isAdmin;
+
+
+cin >> log;
+cin.ignore(); // <-- clear the newline
+
+if (log == 1)
+{
+    string username, password;
+    adminacc admin;
+    bool isAdmin = false;
+
+
+    cout << "Enter Admin Username: ";
+    getline(cin, username);  // use getline
+    cout << "Enter Admin Password: ";
+    getline(cin, password);  // use getline
+
+    if (username == admin.adm && password == admin.pass)
+    {
+        cout << "Login successful! Welcome Admin.\n";
+        isAdmin = true;
+    }
+    else
+    {
+        cout << "Invalid username or password. Exiting...\n";
+        return 0;
+    }
+}
 
     // Preloaded 10 events on the same date
     string sameDate = "17-08-2025";
@@ -310,14 +345,11 @@ int main()
 
     while (true)
     {
-        if (log == 1)
-        {
+        if (isAdmin)
             adminrMenu();
-        }
         else
-        {
             usermenu();
-        }
+
         cin >> choice;
         cin.ignore();
 
@@ -326,6 +358,7 @@ int main()
             cout << "Exiting...\n";
             break;
         }
+
         if (choice == 1)
             bst.viewEvents();
         else if (choice == 2)
@@ -358,12 +391,16 @@ int main()
         }
         else if (choice == 4)
             bst.viewTodaysEvents();
-       
-        else if (choice == 5 && log == 1)
+
+        // Admin-only features
+        else if (isAdmin)
+        {
+            if (choice == 5)
             {
                 Event e;
                 e.id = idCounter++;
                 cout << "Enter Event Name: ";
+                cin.ignore();
                 getline(cin, e.name);
                 cout << "Enter Date (DD-MM-YYYY): ";
                 cin >> e.date;
@@ -377,7 +414,7 @@ int main()
                 bst.addEvent(e);
                 cout << "Event Added!\n";
             }
-            else if (choice == 6 && log == 1)
+            else if (choice == 6)
             {
                 string date, time;
                 cout << "Enter date of the event to edit (DD-MM-YYYY): ";
@@ -386,8 +423,7 @@ int main()
                 cin >> time;
                 bst.editEvent(date, time);
             }
-
-            else if (choice == 7 && log == 1 )
+            else if (choice == 7)
             {
                 string date, time;
                 cout << "Enter Date (DD-MM-YYYY): ";
@@ -397,9 +433,13 @@ int main()
                 bst.deleteEvent(date, time);
                 cout << "Event Deleted (if existed).\n";
             }
-
+            else
+                cout << "Invalid choice, try again.\n";
+        }
         else
+        {
             cout << "Invalid choice, try again.\n";
+        }
     }
 
     return 0;
