@@ -2,7 +2,8 @@
 using namespace std;
 #include <ctime> // for current date
 
-struct Event {
+struct Event
+{
     int id;
     string name;
     string date; // "DD-MM-YYYY"
@@ -10,16 +11,18 @@ struct Event {
     string type;
     string location;
 
-    string key() const {
+    string key() const
+    {
         // Convert date DD-MM-YYYY to YYYYMMDD
-        string y = date.substr(6,4);
-        string m = date.substr(3,2);
-        string d = date.substr(0,2);
+        string y = date.substr(6, 4);
+        string m = date.substr(3, 2);
+        string d = date.substr(0, 2);
         return y + m + d + " " + time; // YYYYMMDD HH:MM
     }
 };
 
-struct Node {
+struct Node
+{
     Event event;
     Node *left;
     Node *right;
@@ -27,12 +30,15 @@ struct Node {
     Node(Event e) : event(e), left(NULL), right(NULL) {}
 };
 
-class EventBST {
+class EventBST
+{
 private:
     Node *root;
 
-    Node* insert(Node* node, Event e) {
-        if (!node) return new Node(e);
+    Node *insert(Node *node, Event e)
+    {
+        if (!node)
+            return new Node(e);
 
         if (e.key() < node->event.key())
             node->left = insert(node->left, e);
@@ -44,8 +50,10 @@ private:
         return node;
     }
 
-    void inorder(Node* node) {
-        if (!node) return;
+    void inorder(Node *node)
+    {
+        if (!node)
+            return;
         inorder(node->left);
         cout << node->event.id << ". " << node->event.date << " " << node->event.time
              << " | " << node->event.name
@@ -54,21 +62,27 @@ private:
         inorder(node->right);
     }
 
-    string toLower(string s) {
+    string toLower(string s)
+    {
         transform(s.begin(), s.end(), s.begin(), ::tolower);
         return s;
     }
 
-    void searchByField(Node* node, string key, string field) {
-        if (!node) return;
+    void searchByField(Node *node, string key, string field)
+    {
+        if (!node)
+            return;
         searchByField(node->left, key, field);
 
         string target = toLower(key);
         string cmp;
-        if (field == "name") cmp = toLower(node->event.name);
-        else cmp = toLower(node->event.type);
+        if (field == "name")
+            cmp = toLower(node->event.name);
+        else
+            cmp = toLower(node->event.type);
 
-        if (cmp.find(target) != string::npos) {
+        if (cmp.find(target) != string::npos)
+        {
             cout << node->event.id << ". " << node->event.date << " " << node->event.time
                  << " | " << node->event.name
                  << " (" << node->event.type << ") at "
@@ -78,39 +92,50 @@ private:
         searchByField(node->right, key, field);
     }
 
-    Node* findMin(Node* node) {
-        while (node && node->left) node = node->left;
+    Node *findMin(Node *node)
+    {
+        while (node && node->left)
+            node = node->left;
         return node;
     }
 
-    Node* remove(Node* node, string key) {
-        if (!node) return node;
+    Node *remove(Node *node, string key)
+    {
+        if (!node)
+            return node;
 
         if (key < node->event.key())
             node->left = remove(node->left, key);
         else if (key > node->event.key())
             node->right = remove(node->right, key);
-        else {
-            if (!node->left) {
-                Node* temp = node->right;
-                delete node;
-                return temp;
-            } else if (!node->right) {
-                Node* temp = node->left;
+        else
+        {
+            if (!node->left)
+            {
+                Node *temp = node->right;
                 delete node;
                 return temp;
             }
-            Node* temp = findMin(node->right);
+            else if (!node->right)
+            {
+                Node *temp = node->left;
+                delete node;
+                return temp;
+            }
+            Node *temp = findMin(node->right);
             node->event = temp->event;
             node->right = remove(node->right, temp->event.key());
         }
         return node;
     }
 
-    void inorderByDate(Node* node, string date) {
-        if (!node) return;
+    void inorderByDate(Node *node, string date)
+    {
+        if (!node)
+            return;
         inorderByDate(node->left, date);
-        if (node->event.date == date) {
+        if (node->event.date == date)
+        {
             cout << node->event.id << ". " << node->event.date << " " << node->event.time
                  << " | " << node->event.name
                  << " (" << node->event.type << ") at "
@@ -119,17 +144,22 @@ private:
         inorderByDate(node->right, date);
     }
 
-    Node* search(Node* node, string key) {
-        if (!node) return nullptr;
-        if (node->event.key() == key) return node;
-        if (key < node->event.key()) return search(node->left, key);
+    Node *search(Node *node, string key)
+    {
+        if (!node)
+            return nullptr;
+        if (node->event.key() == key)
+            return node;
+        if (key < node->event.key())
+            return search(node->left, key);
         return search(node->right, key);
     }
 
-    string makeKey(string date, string time) {
-        string y = date.substr(6,4);
-        string m = date.substr(3,2);
-        string d = date.substr(0,2);
+    string makeKey(string date, string time)
+    {
+        string y = date.substr(6, 4);
+        string m = date.substr(3, 2);
+        string d = date.substr(0, 2);
         return y + m + d + " " + time;
     }
 
@@ -138,32 +168,38 @@ public:
 
     void addEvent(Event e) { root = insert(root, e); }
 
-    void viewEvents() {
-        if (!root) {
+    void viewEvents()
+    {
+        if (!root)
+        {
             cout << "No events scheduled.\n";
             return;
         }
         inorder(root);
     }
 
-    void deleteEvent(string date, string time) {
+    void deleteEvent(string date, string time)
+    {
         string k = makeKey(date, time);
         root = remove(root, k);
     }
 
-    void searchEvent(string key, string field) {
+    void searchEvent(string key, string field)
+    {
         cout << "Search results for \"" << key << "\" in " << field << ":\n";
         searchByField(root, key, field);
     }
 
-    void viewEventsByDate(string date) {
+    void viewEventsByDate(string date)
+    {
         cout << "Events on " << date << " (chronological order):\n";
         inorderByDate(root, date);
     }
 
-    void viewTodaysEvents() {
+    void viewTodaysEvents()
+    {
         time_t t = time(nullptr);
-        tm* now = localtime(&t);
+        tm *now = localtime(&t);
         char buf[11];
         sprintf(buf, "%02d-%02d-%04d", now->tm_mday, now->tm_mon + 1, now->tm_year + 1900);
         string today(buf);
@@ -171,10 +207,12 @@ public:
         inorderByDate(root, today);
     }
 
-    void editEvent(string date, string time) {
+    void editEvent(string date, string time)
+    {
         string k = makeKey(date, time);
-        Node* node = search(root, k);
-        if (!node) {
+        Node *node = search(root, k);
+        if (!node)
+        {
             cout << "Event not found.\n";
             return;
         }
@@ -185,55 +223,81 @@ public:
         string newName;
         cin.ignore();
         getline(cin, newName);
-        if (!newName.empty()) node->event.name = newName;
+        if (!newName.empty())
+            node->event.name = newName;
 
         cout << "Enter new date (DD-MM-YYYY, leave empty to keep current): ";
-        string newDate; getline(cin, newDate);
-        if (!newDate.empty()) node->event.date = newDate;
+        string newDate;
+        getline(cin, newDate);
+        if (!newDate.empty())
+            node->event.date = newDate;
 
         cout << "Enter new time (HH:MM, leave empty to keep current): ";
-        string newTime; getline(cin, newTime);
-        if (!newTime.empty()) node->event.time = newTime;
+        string newTime;
+        getline(cin, newTime);
+        if (!newTime.empty())
+            node->event.time = newTime;
 
         cout << "Enter new type (leave empty to keep current): ";
-        string newType; getline(cin, newType);
-        if (!newType.empty()) node->event.type = newType;
+        string newType;
+        getline(cin, newType);
+        if (!newType.empty())
+            node->event.type = newType;
 
         cout << "Enter new location (leave empty to keep current): ";
-        string newLocation; getline(cin, newLocation);
-        if (!newLocation.empty()) node->event.location = newLocation;
+        string newLocation;
+        getline(cin, newLocation);
+        if (!newLocation.empty())
+            node->event.location = newLocation;
 
         cout << "Event updated successfully!\n";
     }
 };
 
-void showMenu() {
-    cout << "\n===== Smart Event Manager =====\n";
-    cout << "1. Add Event\n";
-    cout << "2. View All Events\n";
-    cout << "3. Edit Event\n";
-    cout << "4. Search Event\n";
-    cout << "5. Delete Event\n";
-    cout << "6. Day View (Specific Date)\n";
-    cout << "7. Today's Events\n";
+void adminrMenu()
+{
+    cout << "1. View All Events\n";
+    cout << "2. Search Event\n";
+    cout << "3. Day View (Specific Date)\n";
+    cout << "4. Today's Events\n";
+    cout << "5. Add Event\n";
+    cout << "6. Edit Event\n";
+    cout << "7. Delete Event\n";
     cout << "0. Exit\n";
-    cout << "===============================\n";
+    cout << endl;
+    cout << "Enter choice: ";
+}
+void usermenu()
+{
+    cout << "1. View All Events\n";
+    cout << "2. Search Event\n";
+    cout << "3. Day View (Specific Date)\n";
+    cout << "4. Today's Events\n";
+    cout << "0. Exit\n";
+    cout << endl;
     cout << "Enter choice: ";
 }
 
-int main() {
+int main()
+{
     EventBST bst;
-    int choice;
+    int choice, log;
     int idCounter = 1;
+
+    cout << "Welcome to smart event manager pls login to proceed" << endl;
+    cout << "1. login as Admin" << endl;
+    cout << "2. Login as user" << endl;
+    cin >> log;
 
     // Preloaded 10 events on the same date
     string sameDate = "17-08-2025";
-    vector<string> times = {"16:00","12:15","11:00","10:30","13:00","14:30","15:45","09:00","17:15","18:30"};
-    vector<string> names = {"Meeting","Workshop","Call","Lunch","Presentation","Discussion","Brainstorm","Training","Review","Party"};
-    vector<string> types = {"Work","Work","Work","Personal","Work","Work","Work","Work","Work","Personal"};
-    vector<string> locations = {"Room A","Room B","Zoom","Cafeteria","Hall","Room C","Room D","Zoom","Hall","Home"};
+    vector<string> times = {"16:00", "12:15", "11:00", "10:30", "13:00", "14:30", "15:45", "09:00", "17:15", "18:30"};
+    vector<string> names = {"Meeting", "Workshop", "Call", "Lunch", "Presentation", "Discussion", "Brainstorm", "Training", "Review", "Party"};
+    vector<string> types = {"Work", "Work", "Work", "Personal", "Work", "Work", "Work", "Work", "Work", "Personal"};
+    vector<string> locations = {"Room A", "Room B", "Zoom", "Cafeteria", "Hall", "Room C", "Room D", "Zoom", "Hall", "Home"};
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         Event e;
         e.id = idCounter++;
         e.name = names[i];
@@ -244,74 +308,98 @@ int main() {
         bst.addEvent(e);
     }
 
-    while (true) {
-        showMenu();
+    while (true)
+    {
+        if (log == 1)
+        {
+            adminrMenu();
+        }
+        else
+        {
+            usermenu();
+        }
         cin >> choice;
         cin.ignore();
 
-        if (choice == 0) {
+        if (choice == 0)
+        {
             cout << "Exiting...\n";
             break;
         }
-
-        if (choice == 1) {
-            Event e;
-            e.id = idCounter++;
-            cout << "Enter Event Name: ";
-            getline(cin, e.name);
-            cout << "Enter Date (DD-MM-YYYY): ";
-            cin >> e.date;
-            cout << "Enter Time (HH:MM): ";
-            cin >> e.time;
-            cin.ignore();
-            cout << "Enter Type: ";
-            getline(cin, e.type);
-            cout << "Enter Location: ";
-            getline(cin, e.location);
-            bst.addEvent(e);
-            cout << "Event Added!\n";
-        }
-        else if (choice == 2) bst.viewEvents();
-        else if (choice == 3) {
-            string date, time;
-            cout << "Enter date of the event to edit (DD-MM-YYYY): ";
-            cin >> date;
-            cout << "Enter time of the event to edit (HH:MM): ";
-            cin >> time;
-            bst.editEvent(date, time);
-        }
-        else if (choice == 4) {
+        if (choice == 1)
+            bst.viewEvents();
+        else if (choice == 2)
+        {
             cout << "Enter 1 for searching by name\n";
             cout << "Enter 2 for searching by type\n";
-            int par; cin >> par; cin.ignore();
+            int par;
+            cin >> par;
+            cin.ignore();
             string keyword;
-            if (par == 1) {
+            if (par == 1)
+            {
                 cout << "Enter name keyword: ";
                 getline(cin, keyword);
                 bst.searchEvent(keyword, "name");
-            } else {
+            }
+            else
+            {
                 cout << "Enter type keyword: ";
                 getline(cin, keyword);
                 bst.searchEvent(keyword, "type");
             }
         }
-        else if (choice == 5) {
-            string date, time;
-            cout << "Enter Date (DD-MM-YYYY): ";
-            cin >> date;
-            cout << "Enter Time (HH:MM): ";
-            cin >> time;
-            bst.deleteEvent(date, time);
-            cout << "Event Deleted (if existed).\n";
-        }
-        else if (choice == 6) {
+        else if (choice == 3)
+        {
             string date;
             cout << "Enter date (DD-MM-YYYY): ";
             cin >> date;
             bst.viewEventsByDate(date);
         }
-        else if (choice == 7) bst.viewTodaysEvents();
-        else cout << "Invalid choice, try again.\n";
+        else if (choice == 4)
+            bst.viewTodaysEvents();
+       
+        else if (choice == 5 && log == 1)
+            {
+                Event e;
+                e.id = idCounter++;
+                cout << "Enter Event Name: ";
+                getline(cin, e.name);
+                cout << "Enter Date (DD-MM-YYYY): ";
+                cin >> e.date;
+                cout << "Enter Time (HH:MM): ";
+                cin >> e.time;
+                cin.ignore();
+                cout << "Enter Type: ";
+                getline(cin, e.type);
+                cout << "Enter Location: ";
+                getline(cin, e.location);
+                bst.addEvent(e);
+                cout << "Event Added!\n";
+            }
+            else if (choice == 6 && log == 1)
+            {
+                string date, time;
+                cout << "Enter date of the event to edit (DD-MM-YYYY): ";
+                cin >> date;
+                cout << "Enter time of the event to edit (HH:MM): ";
+                cin >> time;
+                bst.editEvent(date, time);
+            }
+
+            else if (choice == 7 && log == 1 )
+            {
+                string date, time;
+                cout << "Enter Date (DD-MM-YYYY): ";
+                cin >> date;
+                cout << "Enter Time (HH:MM): ";
+                cin >> time;
+                bst.deleteEvent(date, time);
+                cout << "Event Deleted (if existed).\n";
+            }
+
+        else
+            cout << "Invalid choice, try again.\n";
     }
 
     return 0;
