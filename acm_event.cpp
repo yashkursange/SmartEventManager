@@ -19,6 +19,7 @@ struct Event
         string d = date.substr(0, 2);
         return y + m + d + " " + time; // YYYYMMDD HH:MM
     }
+    
 };
 
 struct adminacc
@@ -169,6 +170,18 @@ private:
         string d = date.substr(0, 2);
         return y + m + d + " " + time;
     }
+     void saveNode(ofstream &out, Node *node)
+    {
+        if (!node) return;
+        saveNode(out, node->left);
+        out << node->event.id << "|"
+            << node->event.name << "|"
+            << node->event.date << "|"
+            << node->event.time << "|"
+            << node->event.type << "|"
+            << node->event.location << "\n";
+        saveNode(out, node->right);
+    }
 
 public:
     EventBST() : root(NULL) {}
@@ -259,6 +272,37 @@ public:
 
         cout << "Event updated successfully!\n";
     }
+
+     void saveToFile()
+    {
+        ofstream out("events.txt");
+        saveNode(out, root);
+        out.close();
+    }
+
+    void loadFromFile(int &idCounter)
+    {
+        ifstream in("events.txt");
+        if (!in.is_open()) return;
+        string line;
+        while (getline(in, line))
+        {
+            stringstream ss(line);
+            string idStr, name, date, time, type, location;
+            getline(ss, idStr, '|'); getline(ss, name, '|'); getline(ss, date, '|');
+            getline(ss, time, '|'); getline(ss, type, '|'); getline(ss, location, '|');
+            Event e;
+            e.id = stoi(idStr);
+            e.name = name;
+            e.date = date;
+            e.time = time;
+            e.type = type;
+            e.location = location;
+            addEvent(e);
+            if (e.id >= idCounter) idCounter = e.id + 1;
+        }
+        in.close();
+    }
 };
 
 void adminrMenu()
@@ -290,6 +334,7 @@ int main()
     EventBST bst;
     int choice, log;
     int idCounter = 1;
+    bst.loadFromFile(idCounter);
 
     cout << "Welcome to smart event manager pls login to proceed" << endl;
     cout << "1. login as Admin" << endl;
@@ -298,9 +343,9 @@ int main()
 
 
 cin >> log;
-cin.ignore(); // <-- clear the newline
+cin.ignore(); 
 
-if (log == 1)
+if (log == '1')
 {
     string username, password;
     adminacc admin;
@@ -308,9 +353,9 @@ if (log == 1)
 
 
     cout << "Enter Admin Username: ";
-    getline(cin, username);  // use getline
+    getline(cin, username);  
     cout << "Enter Admin Password: ";
-    getline(cin, password);  // use getline
+    getline(cin, password);  
 
     if (username == admin.adm && password == admin.pass)
     {
@@ -400,7 +445,6 @@ if (log == 1)
                 Event e;
                 e.id = idCounter++;
                 cout << "Enter Event Name: ";
-                cin.ignore();
                 getline(cin, e.name);
                 cout << "Enter Date (DD-MM-YYYY): ";
                 cin >> e.date;
@@ -413,6 +457,7 @@ if (log == 1)
                 getline(cin, e.location);
                 bst.addEvent(e);
                 cout << "Event Added!\n";
+                bst.saveToFile();
             }
             else if (choice == 6)
             {
@@ -422,6 +467,7 @@ if (log == 1)
                 cout << "Enter time of the event to edit (HH:MM): ";
                 cin >> time;
                 bst.editEvent(date, time);
+                bst.saveToFile();
             }
             else if (choice == 7)
             {
@@ -432,6 +478,7 @@ if (log == 1)
                 cin >> time;
                 bst.deleteEvent(date, time);
                 cout << "Event Deleted (if existed).\n";
+                bst.saveToFile();
             }
             else
                 cout << "Invalid choice, try again.\n";
