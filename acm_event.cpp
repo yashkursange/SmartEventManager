@@ -38,6 +38,69 @@ struct Node
     Node(Event e) : event(e), left(NULL), right(NULL) {}
 };
 
+bool isValidDate(const string &date)
+{
+    regex pattern(R"(^([0-2]\d|3[01])-(0\d|1[0-2])-(\d{4})$)");
+    smatch match;
+
+    if (!regex_match(date, match, pattern))
+        return false;
+
+    int day = (match[1].str()[0] - '0') * 10 + (match[1].str()[1] - '0');
+    int month = (match[2].str()[0] - '0') * 10 + (match[2].str()[1] - '0');
+    int year = (match[3].str()[0] - '0') * 1000 +
+               (match[3].str()[1] - '0') * 100 +
+               (match[3].str()[2] - '0') * 10 +
+               (match[3].str()[3] - '0');
+
+    int daysInMonth[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+        daysInMonth[2] = 29;
+
+    return day >= 1 && day <= daysInMonth[month];
+}
+
+bool isValidTime(const string &time)
+{
+    regex pattern(R"(^(0\d|1\d|2[0-3]):([0-5]\d)$)");
+    return regex_match(time, pattern);
+}
+
+string getValidDate() {
+    string date;
+    while (true) {
+        cout << "Enter Date (DD-MM-YYYY): ";
+        cin >> date;
+        if (isValidDate(date)) return date;
+        cout << "Invalid date. Try again.\n";
+    }
+}
+
+
+string getValidTime()
+{
+    string time;
+    do
+    {
+        cout << "Enter Time (HH:MM): ";
+        cin >> time;
+        if (!isValidTime(time))
+            cout << "Invalid time. Try again.\n";
+    } while (!isValidTime(time));
+    return time;
+}
+
+int strToInt(const string &s) {
+    int result = 0;
+    for(char c : s) {
+        if(c < '0' || c > '9') return -1; // invalid
+        result = result * 10 + (c - '0');
+    }
+    return result;
+}
+
+
+
 class EventBST
 {
 private:
@@ -183,6 +246,36 @@ private:
         saveNode(out, node->right);
     }
 
+    string suggestTime(string date, string time) {
+    int h = strToInt(time.substr(0,2));
+    int m = strToInt(time.substr(3,2));
+    int minutes = h*60 + m;
+
+    for(int offset=15; offset <= 23*60+45; offset+=15){
+        int newMinutes = minutes + offset;
+        if(newMinutes >= 24*60) break;
+        int nh = newMinutes / 60;
+        int nm = newMinutes % 60;
+        char buf[6];
+        sprintf(buf,"%02d:%02d", nh, nm);
+        string key = makeKey(date, buf);
+        if(!search(root,key)) return buf;
+    }
+
+    for(int offset=15; offset <= minutes; offset+=15){
+        int newMinutes = minutes - offset;
+        int nh = newMinutes / 60;
+        int nm = newMinutes % 60;
+        char buf[6];
+        sprintf(buf,"%02d:%02d", nh, nm);
+        string key = makeKey(date, buf);
+        if(!search(root,key)) return buf;
+    }
+
+    return ""; 
+}
+
+
 public:
     EventBST() : root(NULL) {}
 
@@ -249,13 +342,13 @@ public:
         cout << "Enter new date (DD-MM-YYYY, leave empty to keep current): ";
         string newDate;
         getline(cin, newDate);
-        if (!newDate.empty())
+        if (!newDate.empty() && isValidDate(newDate))
             node->event.date = newDate;
 
         cout << "Enter new time (HH:MM, leave empty to keep current): ";
         string newTime;
         getline(cin, newTime);
-        if (!newTime.empty())
+        if (!newTime.empty() && isValidTime(newTime))
             node->event.time = newTime;
 
         cout << "Enter new type (leave empty to keep current): ";
@@ -303,6 +396,19 @@ public:
         }
         in.close();
     }
+
+    void addEventWithConflictCheck(Event e) {
+    if(search(root, e.key())) {
+        cout << "Conflict detected at " << e.date << " " << e.time << endl;
+        string suggested = suggestTime(e.date, e.time);
+        if(!suggested.empty())
+            cout << "Suggested available time: " << suggested << endl;
+        return;
+    }
+    root = insert(root, e);
+    }
+
+
 };
 
 void adminrMenu()
@@ -447,15 +553,15 @@ if (log == '1')
                 cout << "Enter Event Name: ";
                 getline(cin, e.name);
                 cout << "Enter Date (DD-MM-YYYY): ";
-                cin >> e.date;
+                e.date = getValidDate();
                 cout << "Enter Time (HH:MM): ";
-                cin >> e.time;
+                e.time = getValidTime();
                 cin.ignore();
                 cout << "Enter Type: ";
                 getline(cin, e.type);
                 cout << "Enter Location: ";
                 getline(cin, e.location);
-                bst.addEvent(e);
+                bst.addEventWithConflictCheck(e);;
                 cout << "Event Added!\n";
                 bst.saveToFile();
             }
