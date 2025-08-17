@@ -408,6 +408,37 @@ public:
     root = insert(root, e);
     }
 
+    void traverseForReminders(function<void(Node*)> func) {
+    function<void(Node*)> traverse = [&](Node* node){
+        if(!node) return;
+        traverse(node->left);
+        func(node);
+        traverse(node->right);
+    };
+    traverse(root);
+    }
+
+    void sendEmailReminders(EventBST &bst) {
+    time_t t = time(nullptr);
+    tm *now = localtime(&t);
+    char buf[11];
+    sprintf(buf,"%02d-%02d-%04d", now->tm_mday, now->tm_mon+1, now->tm_year+1900);
+    string today(buf);
+
+    cout << "\n--- Email Reminders for Today (" << today << ") ---\n";
+
+    function<void(Node*)> collectToday = [&](Node* node){
+        if(!node) return;
+        if(node->event.date == today)
+            cout << "Reminder sent: Event '" << node->event.name 
+                 << "' at " << node->event.time 
+                 << " | Type: " << node->event.type 
+                 << " | Location: " << node->event.location << endl;
+    };
+
+    bst.traverseForReminders(collectToday);
+    cout << "-----------------------------------------\n";
+    }
 
 };
 
@@ -451,7 +482,7 @@ int main()
 cin >> log;
 cin.ignore(); 
 
-if (log == '1')
+if (log == 1)
 {
     string username, password;
     adminacc admin;
