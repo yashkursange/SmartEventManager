@@ -465,7 +465,7 @@ int main()
     }
 
     // Preloaded 10 events on the same date
-    string sameDate = "17-08-2025";
+    string sameDate = "18-08-2025";
     vector<string> times = {"16:00", "12:15", "11:00", "10:30", "13:00",
                             "14:30", "15:45", "09:00", "17:15", "18:30"};
     vector<string> names = {"Meeting", "Workshop", "Call", "Lunch", "Presentation",
@@ -536,6 +536,7 @@ int main()
             cout << "Enter date (DD-MM-YYYY): ";
             cin >> date;
             bst.viewEventsByDate(date);
+
         }
         else if (choice == 4)
         {
@@ -553,9 +554,11 @@ int main()
 
                 cout << "Enter Date (DD-MM-YYYY): ";
                 e.date = getValidDate();
+                cin.ignore();
 
                 cout << "Enter Time (HH:MM): ";
                 e.time = getValidTime();
+                cin.ignore();
 
                 cout << "Enter Type: ";
                 getline(cin, e.type);

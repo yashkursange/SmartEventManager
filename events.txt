@@ -1,0 +1,20 @@
+8|Training|17-08-2025|09:00|Work|Zoom
+4|Lunch|17-08-2025|10:30|Personal|Cafeteria
+3|Call|17-08-2025|11:00|Work|Zoom
+2|Workshop|17-08-2025|12:15|Work|Room B
+5|Presentation|17-08-2025|13:00|Work|Hall
+6|Discussion|17-08-2025|14:30|Work|Room C
+7|Brainstorm|17-08-2025|15:45|Work|Room D
+1|Meeting|17-08-2025|16:00|Work|Room A
+9|Review|17-08-2025|17:15|Work|Hall
+10|Party|17-08-2025|18:30|Personal|Home
+19|Training|18-08-2025|09:00|Work|Zoom
+15|Lunch|18-08-2025|10:30|Personal|Cafeteria
+13|Workshop|18-08-2025|12:15|Work|Room B
+16|Presentation|18-08-2025|13:00|Work|Hall
+17|Discussion|18-08-2025|14:30|Work|Room C
+18|Brainstorm|18-08-2025|15:45|Work|Room D
+12|Meeting|18-08-2025|16:00|Work|Room A
+20|Review|18-08-2025|17:15|Work|Hall
+21|Party|18-08-2025|18:30|Personal|Home
+11|ANANTYA|19-08-2025|02:40||maharashtra
